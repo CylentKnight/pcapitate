@@ -5,6 +5,7 @@
 #       ~~~~~~~~~~~~~~~~~~~~~~~By: CylentKnight~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    #
 #      Version 1.0: Crude but functional, requires 6 static arguments to include    #
 # start date, start time, end date, end time, IP to filter, and Output Destination. #
+#       Script requires editcap (part of the Wireshark application) and tcpdump.    #
 #####################################################################################
 
 strStartDate=$1
