@@ -33,10 +33,13 @@ $pword = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($pword)
 $pword = [Runtime.InteropServices.Marshal]::PtrToStringAuto($pword)
 $startTime = Read-Host "Start Time (YYYY-MM-DD hh:mm:ss)"
 $stopTime = Read-Host "End Time (YYYY-MM-DD hh:mm:ss)"
-$IPQuery = Read-Host "IP to Filter"
+$IPQuery = Read-Host "IP to Filter (optional)"
 $ldest = Read-Host "Destination path and filename"
 
-$execCommand = @('/usr/bin/pcapitate.sh ' + $startTime + ' ' + $stopTime + ' ' + $IPQuery + ' /tmp/pcapitator.pcap') #point to pcapitate location on remote linux machine
+if ($IPQuery > "") {
+  $execCommand = @('/usr/bin/pcapitate.sh -a ' + $startTime + ' -b ' + $stopTime + ' -i' + $IPQuery + '-o /tmp/pcapitator.pcap') #point to pcapitate location on remote linux machine
+} else {
+  $execCommand = @('/usr/bin/pcapitate.sh -a ' + $startTime + ' -b ' + $stopTime + ' -o /tmp/pcapitator.pcap') #point to pcapitate location on remote linux machine
 echo "[+] Beginning Extraction. Please wait..."
 plink -ssh $rhost -l $uname -pw $pword $execCommand
 echo "[+] Extraction Complete. Beginning File Transfer"
