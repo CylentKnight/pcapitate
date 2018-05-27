@@ -40,6 +40,7 @@ if ($IPQuery > "") {
   $execCommand = @('/usr/bin/pcapitate.sh -a ' + $startTime + ' -b ' + $stopTime + ' -i' + $IPQuery + '-o /tmp/pcapitator.pcap') #point to pcapitate location on remote linux machine
 } else {
   $execCommand = @('/usr/bin/pcapitate.sh -a ' + $startTime + ' -b ' + $stopTime + ' -o /tmp/pcapitator.pcap') #point to pcapitate location on remote linux machine
+}
 echo "[+] Beginning Extraction. Please wait..."
 plink -ssh $rhost -l $uname -pw $pword $execCommand
 echo "[+] Extraction Complete. Beginning File Transfer"
