@@ -3,7 +3,7 @@
 #####################################################################################
 #       ~~~~~~~~~~~~~~~~~~~~~~~~~~~PCAPITATE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    #
 #       ~~~~~~~~~~~~~~~~~~~~~~~By: CylentKnight~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    #
-#        Version 1.1: Crude but functional, requires 5-6 arguments to include       #
+#       Version 1.1: User friendly version, requires 5-6 arguments to include       #
 # start date, start time, end date, end time, IP (Optional), and Output Destination.#
 #       Script requires editcap (part of the Wireshark application) and tcpdump.    #
 #####################################################################################
