@@ -4,47 +4,107 @@
 # hardcoded paths which may need to change depending on individual architectures     #
 ######################################################################################
 
-clear
-echo ""
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~PCAPITATOR~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-echo "~~~~~~~~~~~~~~~~~~~~~~By: CylentKnight~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-echo "  Ver 1.0: Quickly extract TCPDump data from a remote linux machine"
-echo " filtered by time and host IP (both source and destination). Output"
-echo "  will be automatically delivered to the local destination of your"
-echo "                           choosing"
-echo ""
+Add-Type -AssemblyName System.Windows.Forms
 
-$plinkPath = "C:\Program Files\Putty_0.68_x64\plink.exe" #point this to the location of plink.exe
-If (Test-Path $plinkPath) {
-  Set-Alias plink $plinkPath
-} else {
-  Throw "ERROR: plink.exe not found"
-}
-$pscpPath = "C:\Program Files\Putty_0.68_x64\pscp.exe"  #point this to the location of pscp.exe
-If (Test-Path $pscpPath) {
-} else {
-  Throw "ERROR: pscp.exe not found"
+Function btnBrowse_Click {
+  $saveFileDialog = New-Object System.Windows.Forms.SaveFileDialog
+  $saveFileDialog.InitialDirectory = [System.IO.Directory]::GetCurrentDirectory()
+  $saveFileDialog.Title = "Save Output As"
+  $saveFileDialog.Filter = "PCAP Files (*.pcap)|*.pcap"
+  $saveFileDialog.ShowHelp = $True
+  $saveFilePath = $saveFileDialog.ShowDialog()
+  if($saveFilePath -eq "OK") {
+    $filePathTextBox.Text = $saveFileDialog.FileName
+  }
 }
 
-$rhost = Read-Host "Source IP"
-$uname = Read-Host "Username"
-$pword = Read-Host "Password" -AsSecureString
-$pword = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($pword)
-$pword = [Runtime.InteropServices.Marshal]::PtrToStringAuto($pword)
-$startTime = Read-Host "Start Time (YYYY-MM-DD hh:mm:ss)"
-$stopTime = Read-Host "End Time (YYYY-MM-DD hh:mm:ss)"
-$IPQuery = Read-Host "IP to Filter (optional)"
-$ldest = Read-Host "Destination path and filename"
+Function btnOk_Click {
 
-if ($IPQuery > "") {
-  $execCommand = @('/usr/bin/pcapitate.sh -a ' + $startTime + ' -b ' + $stopTime + ' -i' + $IPQuery + '-o /tmp/pcapitator.pcap') #point to pcapitate location on remote linux machine
-} else {
-  $execCommand = @('/usr/bin/pcapitate.sh -a ' + $startTime + ' -b ' + $stopTime + ' -o /tmp/pcapitator.pcap') #point to pcapitate location on remote linux machine
+  $plinkPath = "C:\Program Files\Putty_0.68_x64\plink.exe" #point this to the location of plink.exe
+  If (Test-Path $plinkPath) {
+    Set-Alias plink $plinkPath
+  } else {
+    Throw "ERROR: plink.exe not found"
+  }
+  $pscpPath = "C:\Program Files\Putty_0.68_x64\pscp.exe"  #point this to the location of pscp.exe
+  If (Test-Path $pscpPath) {
+  } else {
+    Throw "ERROR: pscp.exe not found"
+  }
+
+  $rhost = $dropDownBox.SelectedItem.ToString()
+  $uname = $userNameTextBox.Text
+  $pword = $maskedTextBox.Text
+  $startTime = $datePicker1.Text
+  $stopTime = $datePicker2.Text
+  $IPQuery = $ipFilterTextBox.Text
+  $ldest = $filePathTextBox.Text
+
+  if ($IPQuery > "") {
+    $execCommand = @('/usr/bin/pcapitate.sh -a ' + $startTime + ' -b ' + $stopTime + ' -i' + $IPQuery + '-o /tmp/pcapitator.pcap') #point to pcapitate location on remote linux machine
+  } else {
+    $execCommand = @('/usr/bin/pcapitate.sh -a ' + $startTime + ' -b ' + $stopTime + ' -o /tmp/pcapitator.pcap') #point to pcapitate location on remote linux machine
+  }
+  
+  $statusBar.Text = "[+] Beginning Extraction. Please wait..."
+  plink -ssh $rhost -l $uname -pw $pword $execCommand
+  $statusBar.Text = Extraction Complete. Beginning File Transfer"
+  pscp -l $uname -pw $pword ${rhost}:/tmp/pcapitator.pcap $ldest
+  $statusBar.Text = "[+] Cleaning up.
+  plink -ssh $rhost -l $uname -pw $pword rm /tmp/pcapitator.pcap
+  $pword="OVERWRITE"
 }
-echo "[+] Beginning Extraction. Please wait..."
-plink -ssh $rhost -l $uname -pw $pword $execCommand
-echo "[+] Extraction Complete. Beginning File Transfer"
-pscp -l $uname -pw $pword ${rhost}:/tmp/pcapitator.pcap $ldest
-echo "[+] Cleaning up.
-plink -ssh $rhost -l $uname -pw $pword rm /tmp/pcapitator.pcap
-$pword="OVERWRITE"
+
+$rhost = ""
+$startTime = ""
+$stopTime = ""
+
+$form = New-Object System.Windows.Forms.Form
+  $form.Text = "Pcapitator"
+  $form.Width = "500"
+  $form.Height = "430"
+
+<### FONT OPTIONS ###>
+#$font = new-Object System.Drawing.Font("Lucida Sans",12)
+#$form.font = $font
+
+<### COLOR OPTIONS ###>
+#$form.ForeColor = "Crimson"
+#$form.BackColor = "DarkGray"
+
+$linuxIPArray = @("192.168.1.10","192.168.1.20","192.168.1.30")
+
+$dropDownLabel = New-Object System.Windows.Forms.Label
+  $dropDownLabel.Text = "Host Machine IP"
+  $dropDownLabel.Location = "15,20"
+  $dropDownLabel.Height = "22"
+  $dropDownLabel.Width = "90"
+  $form.Controls.Add($dropDownLabel)
+  
+$dropDownBox = New-Object System.Windows.Forms.ComboBox
+  $dropDownBox.Location = New-Object System.Drawing.Size(110,20)
+  $dropDownBox.Size = New-Object System.Drawing.Size(200,20)
+  $dropDownBox.DropDownHeight = 200
+  $form.Controls.Add($dropDownBox)
+  
+foreach ($IP in $linuxIPArray) {
+  $dropDownBox.Items.Add($IP)
+}
+
+$datePickerLabel1 = New-Object System.Windows.Forms.Label
+  $datePickerLabel1.Text = "Start time (YYYY-MM-DD HH:mm:ss)"
+  $datePickerLabel1.Location - "110,60"
+  $datePickerLabel1.Height = "22"
+  $datePickerLabel1.Width = "90
+  $form.Controls.Ass($datePickerLabel1)
+  
+$datePicker1 = New Object System.Windows.Forms.DateTimePicker
+  $datePicker1.Location = "110,60"
+  $datePicker1.Width = "200"
+  $datePicker.Format = [Windows.Forms.DateTimePickerFormat]::custom
+  $datePicker1.CustomFormat = "yyyy-MM-DD HH:mm:ss"
+  
+  #TO BE CONTINUED
+
+
+
