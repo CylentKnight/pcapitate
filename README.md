@@ -1,11 +1,18 @@
 # pcapitate
-CURRENT BRANCH:
+CURRENT Version:
 ===============
 V1.1
 
 SUMMARY:
 ========
-Project: extract packets based on host IP and time frame from large tcpdump file
+A great tool for infosec and sysadmins who collect tcpdump data on one or more remote linux machine(s). These files can be very large and often need to be split prior to being moved and analyzed. Pcapitate.sh is a standalone linux side script which allows the user to filter out packets by time range as well as by host IP (source and destination).  In addition to Pcapitate I've included Pcapitator.ps1 which is a windows side administration tool for Pcapitate.sh. Pcapitator is a Powershell built GUI and interface agent which automatically collects and forwards information to pcapitate.sh via ssh and transfers the output pcap to the local windows machine or file share.
+
+DEPENDENCIES:
+=============
+plink.exe (PuTTY - Windows)
+pscp.exe (PuTTY - Windows)
+editcap (Wireshark - Linux)
+tcpdump (tcpdump - Linux)
 
 DESCRIPTION:
 ============
@@ -19,8 +26,6 @@ Next is a powershell script (pcapitator.ps1) intended to gather the necessary in
 1. username
 2. password
 3. local output file destination
-
-These are the version 1.0 requirements.
 
 IN DEV:
 =======
