@@ -24,9 +24,8 @@ These are the version 1.0 requirements.
 
 IN DEV:
 =======
-1. Input validation
+1. Input validation :heavy_check_mark:
 2. A simple GUI for pcapitator.ps1 :heavy_check_mark:
 3. Argument switches for pcapitate.sh :heavy_check_mark:
-4. error handling
-5. Optional IP filtering :heavy_check_mark:
-6. key pair usage
+4. Optional IP filtering :heavy_check_mark:
+5. key pair usage
