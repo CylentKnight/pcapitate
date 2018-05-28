@@ -8,6 +8,7 @@
 #       Script requires editcap (part of the Wireshark application) and tcpdump.    #
 #####################################################################################
 
+### Begin Argument Parsing ###
 while [[ $# -gt 0 ]] && [[ ."$1" = .-* ]]; do
   arg="$1"
   shift;
