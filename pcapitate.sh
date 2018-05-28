@@ -49,15 +49,28 @@ while [[ $# -gt 0 ]] && [[ ."$1" = .-* ]]; do
   esac
 done
 
+### Begin Input Validation ###
 if [ -z "$strStartDate" ] || [ -z "$strStartTime" ] || [ -z "$strEndDate" ] || [ -z "$strEndTime" ] || [ -z "$strOutFile"]; then
   echo "Missing arguments, type -h for help"
   exit 1
 fi
-
+if [[ $strStartDate =~ ^20[0-9]{2}-[0-1][0-9]-[0-3][0-9]$ ]] || [[ $strEndDate =~ ^20[0-9]{2}-[0-1][0-9]-[0-3][0-9]$ ]]; then
+  echo "SYNTAX ERROR: Invalid date format YYYY-MM-DD"
+  exit 1
+fi
+if [[ $strStartTiem =~ ^[0-2][0-9]:[0-5][0-9]:[0-5][0-9]$ ]] || [[ $strEndDate =~ ^[0-2][0-9]:[0-5][0-9]:[0-5][0-9]$ ]]; then
+  echo "SYNTAX ERROR: Invalid time format HH:mm:ss"
+  exit 1
+fi
 if [ -z "$strHost" ]; then
   noHost=1
+else
+  if [[ $strHost =~ ^[0-9]{1-3}.[0-9]{1-3}.[0-9]{1-3}.[0-9]{1-3}$ ]]; then
+    echo "SYNTAX ERROR: Invalid -i filter IP"
+    exit 1
 fi
 
+### Begin Spinning Gears ###
 cp /data/TCPDumpLog/pcap /tmp/pcap_copy #change this to the path of your live tcpdump file
 /usr/bin/editcap -A """$strStartDate $strStartTime""" -B """$strEndDate $strEndTime""" /tmp/pcap_copy /tmp/pcap_tmp &>/dev/null
 rm /tmp/pcap_copy
